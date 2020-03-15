@@ -14,7 +14,7 @@ passport.use(
     {
       clientID: '1083481281945-b7jup2u4dn0l48p0966u3gnp4vjf4ln8.apps.googleusercontent.com',
       clientSecret: 'YWdovf9Jrf6ITXByuuk8BUa1',
-      callbackURL: 'http://localhost:8000/auth/callback'
+      callbackURL: 'http://localhost:8000/auth/google/callback'
     },
     (accessToken, refreshToken, profile, done) => {
       done(null, profile);
@@ -39,7 +39,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, '/public')));
-app.use(session({ secret: 'anything' }));
+app.use(session({ secret: 'anything', resave: true, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -54,6 +54,8 @@ app.get('/user/logged', (req, res) => {
 app.get('/user/no-permission', (req, res) => {
   res.render('noPermission');
 });
+
+app.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
 
 app.use('/', (req, res) => {
   res.status(404).render('notFound');
